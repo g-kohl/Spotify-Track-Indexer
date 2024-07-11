@@ -1,8 +1,12 @@
 import requests
 import json
+import os
+from dotenv import load_dotenv
 
-clientId = "f56c4d0716ca4c8e872d14e0914a6c8c"
-clientSecret = "2b7a100fda8d42a2833ad8cedab1567e"
+load_dotenv()
+
+clientId = os.getenv("CLIENT_ID")
+clientSecret = os.getenv("CLIENT_SECRET")
 
 def getToken():
     return requests.post("https://accounts.spotify.com/api/token", 
