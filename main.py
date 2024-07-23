@@ -3,13 +3,14 @@ import json
 import os
 from dotenv import load_dotenv
 from collections import namedtuple
-# import SimpleNamespace as Namespace
+# from pprint import pprint
 
+class Artist:
+    def __init__(self, id, name, popularity, followers, genres, external_URLs):
+        self.id, self.name, self.popularity, self.followers, self.genres, self.external_URLs = id, name, popularity, followers, genres, external_URLs
 
-# class Artist:
-#     def __init__(self, id, name, popularity, followers, genres, external_URLs):
-#         self.id, self.name, self.popularity, self.followers, self.genres, self.external_URLs = id, name, popularity, followers, genres, external_URLs
-
+    def __str__(self):
+        return self.id + self.name + str(self.popularity) + str(self.followers) + str(self.genres) + str(self.external_URLs)
 
 load_dotenv()
 
@@ -39,19 +40,25 @@ def authorizationHeader(token):
     return {"Authorization": "Bearer " + token}
 
 
-def makeArtist(artistDictionary):
+def artistJSONtoObj(artistDictionary):
     return namedtuple('X', artistDictionary.keys())(*artistDictionary.values())
 
 
+def makeArtistObj(artistJSON):
+    artistJSON = json.loads(artistJSON.text, object_hook=artistJSONtoObj)
+
+    return Artist(artistJSON.id, artistJSON.name, artistJSON.popularity, artistJSON.followers.total, artistJSON.genres, artistJSON.external_urls)
+
 token = getAccessToken()
 
-artistObj = requests.get(
+artistJSON = requests.get(
     "https://api.spotify.com/v1/artists/06HL4z0CvFAxyc27GXpf02?si=_SxFzIqhTXSMtPUdvBseLw",
     headers=authorizationHeader(token),
 )
 
-# artist = json.loads(artistObj.text)
+artistExample = makeArtistObj(artistJSON)
 
-artist = json.loads(artistObj.text, object_hook=makeArtist)
-
-print(artist.name, artist.popularity)
+seila = b'\xC3\xA9'
+file = open('binaryFileEx.bin', 'wb')
+file.write(seila)
+file.close()
