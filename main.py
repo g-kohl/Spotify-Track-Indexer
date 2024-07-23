@@ -2,6 +2,14 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
+from collections import namedtuple
+# import SimpleNamespace as Namespace
+
+
+# class Artist:
+#     def __init__(self, id, name, popularity, followers, genres, external_URLs):
+#         self.id, self.name, self.popularity, self.followers, self.genres, self.external_URLs = id, name, popularity, followers, genres, external_URLs
+
 
 load_dotenv()
 
@@ -31,6 +39,10 @@ def authorizationHeader(token):
     return {"Authorization": "Bearer " + token}
 
 
+def makeArtist(artistDictionary):
+    return namedtuple('X', artistDictionary.keys())(*artistDictionary.values())
+
+
 token = getAccessToken()
 
 artistObj = requests.get(
@@ -38,6 +50,8 @@ artistObj = requests.get(
     headers=authorizationHeader(token),
 )
 
-artist = json.loads(artistObj.text)
+# artist = json.loads(artistObj.text)
 
-print(artist)
+artist = json.loads(artistObj.text, object_hook=makeArtist)
+
+print(artist.name, artist.popularity)
