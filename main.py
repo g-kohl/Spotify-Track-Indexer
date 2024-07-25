@@ -3,14 +3,8 @@ import json
 import os
 from dotenv import load_dotenv
 from collections import namedtuple
+from models import *
 # from pprint import pprint
-
-class Artist:
-    def __init__(self, id, name, popularity, followers, genres, external_URLs):
-        self.id, self.name, self.popularity, self.followers, self.genres, self.external_URLs = id, name, popularity, followers, genres, external_URLs
-
-    def __str__(self):
-        return self.id + self.name + str(self.popularity) + str(self.followers) + str(self.genres) + str(self.external_URLs)
 
 load_dotenv()
 

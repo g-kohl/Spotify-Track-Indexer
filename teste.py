@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import os
+from models import *
 
 load_dotenv()
 
@@ -17,7 +18,27 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
                                                redirect_uri=redirectUri))
 
 
-results = sp.current_user_saved_tracks()
-for idx, item in enumerate(results['items']):
-    track = item['track']
-    print(idx, track['artists'][0]['name'], " – ", track['name'])
+results = sp.current_user_playlists()
+
+playlists = []
+
+for _, playlist in enumerate(results['items']):
+    items = sp.playlist_items(playlist['uri'])['items']
+    new_playlist = Playlist(playlist['id'], playlist['name'])
+
+    for item in items:
+        trackObj = item['track']
+        try:
+            new_playlist.append_track(
+                Track(
+                    trackId=trackObj['id'],
+                    name=trackObj['name'],
+                    duration=trackObj['duration_ms'],
+                    explicit=trackObj['explicit'],
+                    popularity=trackObj['popularity'],
+                )
+            )
+        except:
+            print("Track parsing error")
+    
+    playlists.append(new_playlist)
