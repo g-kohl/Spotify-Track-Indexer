@@ -2,8 +2,9 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
-from collections import namedtuple
+# from collections import namedtuple
 from models import *
+import struct
 # from pprint import pprint
 
 load_dotenv()
@@ -34,14 +35,15 @@ def authorizationHeader(token):
     return {"Authorization": "Bearer " + token}
 
 
-def artistJSONtoObj(artistDictionary):
-    return namedtuple('X', artistDictionary.keys())(*artistDictionary.values())
+# def artistJSONtoObj(artistDictionary):
+#     return namedtuple('X', artistDictionary.keys())(*artistDictionary.values())
 
 
 def makeArtistObj(artistJSON):
-    artistJSON = json.loads(artistJSON.text, object_hook=artistJSONtoObj)
+    artistJSON = json.loads(artistJSON)
 
-    return Artist(artistJSON.id, artistJSON.name, artistJSON.popularity, artistJSON.followers.total, artistJSON.genres, artistJSON.external_urls)
+    return Artist(artistJSON["id"], artistJSON["name"], artistJSON["popularity"], artistJSON["followers"]["total"], artistJSON["genres"], artistJSON["external_urls"])
+
 
 token = getAccessToken()
 
@@ -50,9 +52,21 @@ artistJSON = requests.get(
     headers=authorizationHeader(token),
 )
 
-artistExample = makeArtistObj(artistJSON)
+artistExample = makeArtistObj(artistJSON.text)
 
-seila = b'\xC3\xA9'
-file = open('binaryFileEx.bin', 'wb')
-file.write(seila)
-file.close()
+artistString = str(artistExample)
+artistStringBin = artistString.encode('utf-8')
+
+with open('binaryFileEx.bin', 'wb') as f:
+    f.write(struct.pack('I', len(artistStringBin)))
+    f.write(artistStringBin)
+
+with open('binaryFileEx.bin', 'rb') as f:
+    stringSize = struct.unpack('I', f.read(4))[0]
+
+    artistStringBin = f.read(stringSize)
+    artistString = artistStringBin.decode('utf-8')
+
+f.close()
+
+print(artistString)
