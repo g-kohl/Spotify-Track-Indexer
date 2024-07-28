@@ -45,6 +45,11 @@ def makeArtistObj(artistJSON):
     return Artist(artistJSON["id"], artistJSON["name"], artistJSON["popularity"], artistJSON["followers"]["total"], artistJSON["genres"], artistJSON["external_urls"])
 
 
+def encodeUTF8(object):
+    objectString = str(objectString)
+    objectString = objectString.encode('utf-8')
+
+
 token = getAccessToken()
 
 artistJSON = requests.get(
@@ -54,8 +59,7 @@ artistJSON = requests.get(
 
 artistExample = makeArtistObj(artistJSON.text)
 
-artistString = str(artistExample)
-artistStringBin = artistString.encode('utf-8')
+artistStringBin = encodeUTF8(artistExample)
 
 with open('binaryFileEx.bin', 'wb') as f:
     f.write(struct.pack('I', len(artistStringBin)))
