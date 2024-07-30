@@ -8,7 +8,7 @@ class Track:
         self.external_URLs = external_URLs
 
     def __str__(self):
-        return self.id + self.name + str(self.popularity) + str(self.duration) + str(self.explicit) + str(self.external_URLs)
+        return '#' + self.id + '*' + self.name + '*' + str(self.popularity) + '*' + str(self.duration) + '*' + str(self.explicit) + '*' + str(self.external_URLs)
 
 
 class Playlist:
@@ -36,7 +36,7 @@ class Artist:
         self.external_URLs = external_URLs
 
     def __str__(self):
-        return self.id + self.name + str(self.popularity) + str(self.followers) + str(self.genres) + str(self.external_URLs)
+        return '#' + self.id + '*' + self.name + '*' + str(self.popularity) + '*' + str(self.followers) + '*' + str(self.genres) + '*' + str(self.external_URLs)
 
 
 class User:

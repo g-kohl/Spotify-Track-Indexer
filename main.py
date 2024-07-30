@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 # from collections import namedtuple
 from models import *
 import struct
+import unicodedata
 # from pprint import pprint
 
 load_dotenv()
@@ -46,8 +47,25 @@ def makeArtistObj(artistJSON):
 
 
 def encodeUTF8(object):
-    objectString = str(objectString)
-    objectString = objectString.encode('utf-8')
+    objectString = str(object)
+
+    return unicodedata.normalize('NFKD', objectString).encode('ASCII', 'ignore')
+
+
+def writeInBinaryFile(fileName, string):
+    with open(fileName, 'wb') as f:
+        f.write(struct.pack('I', len(string)))
+        f.write(string)
+
+
+def readFromBinaryFile(fileName):
+    with open(fileName, 'rb') as f:
+        stringSize = struct.unpack('I', f.read(4))[0]
+        string = f.read(stringSize)
+
+    f.close()
+
+    return string.decode('utf-8', 'ignore')
 
 
 token = getAccessToken()
@@ -58,19 +76,9 @@ artistJSON = requests.get(
 )
 
 artistExample = makeArtistObj(artistJSON.text)
-
 artistStringBin = encodeUTF8(artistExample)
 
-with open('binaryFileEx.bin', 'wb') as f:
-    f.write(struct.pack('I', len(artistStringBin)))
-    f.write(artistStringBin)
-
-with open('binaryFileEx.bin', 'rb') as f:
-    stringSize = struct.unpack('I', f.read(4))[0]
-
-    artistStringBin = f.read(stringSize)
-    artistString = artistStringBin.decode('utf-8')
-
-f.close()
+writeInBinaryFile('binaryFileEx.bin', artistStringBin)
+artistString = readFromBinaryFile('binaryFileEx.bin')
 
 print(artistString)
