@@ -29,15 +29,17 @@ for _, playlist in enumerate(results['items']):
     for item in items:
         trackObj = item['track']
         try:
-            new_playlist.append_track(
-                Track(
-                    trackId=trackObj['id'],
+            new_track = Track(
+                    id=trackObj['id'],
                     name=trackObj['name'],
+                    popularity=trackObj['popularity'],
                     duration=trackObj['duration_ms'],
                     explicit=trackObj['explicit'],
-                    popularity=trackObj['popularity'],
+                    external_URLs=trackObj['external_urls']
                 )
-            )
+            
+            new_playlist.append_track(new_track)
+            print(new_playlist.name, new_track.name)
         except:
             print("Track parsing error")
     

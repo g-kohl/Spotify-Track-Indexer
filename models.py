@@ -1,6 +1,6 @@
 class Track:
     def __init__(self, id, name, popularity, duration, explicit, external_URLs):
-        self.trackId = id
+        self.id = id
         self.name = name
         self.popularity = popularity
         self.duration = duration
@@ -12,11 +12,11 @@ class Track:
 
 
 class Playlist:
-    def __init__(self, id, name, followers, external_URLs):
+    def __init__(self, id, name):
         self.id = id
         self.name = name
-        self.followers = followers
-        self.external_URLS = external_URLs
+        # self.followers = followers
+        # self.external_URLS = external_URLs
         self.tracks = []
     
     def append_track(self, track: Track):
