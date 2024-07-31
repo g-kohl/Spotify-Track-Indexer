@@ -4,6 +4,24 @@ from spotipy.oauth2 import SpotifyOAuth
 import os
 from models import *
 
+
+def append_tracks_to_playlist(playlist, tracks):
+    for track in tracks:
+        track_info = track['track']
+
+        new_track = Track(
+                id=track_info['id'],
+                name=track_info['name'],
+                popularity=track_info['popularity'],
+                duration=track_info['duration_ms'],
+                explicit=track_info['explicit'],
+                external_URLs=track_info['external_urls']
+            )
+        
+        playlist.append_track(new_track)
+        # print(new_playlist.name, new_track.name)
+
+
 load_dotenv()
 
 clientId = os.getenv("SPOTIPY_CLIENT_ID")
@@ -23,24 +41,12 @@ results = sp.current_user_playlists()
 playlists = []
 
 for _, playlist in enumerate(results['items']):
-    items = sp.playlist_items(playlist['uri'])['items']
+    tracks = sp.playlist_items(playlist_id=playlist['id'],
+                               fields="items,next", additional_types="tracks")
     new_playlist = Playlist(playlist['id'], playlist['name'])
 
-    for item in items:
-        trackObj = item['track']
-        try:
-            new_track = Track(
-                    id=trackObj['id'],
-                    name=trackObj['name'],
-                    popularity=trackObj['popularity'],
-                    duration=trackObj['duration_ms'],
-                    explicit=trackObj['explicit'],
-                    external_URLs=trackObj['external_urls']
-                )
-            
-            new_playlist.append_track(new_track)
-            print(new_playlist.name, new_track.name)
-        except:
-            print("Track parsing error")
-    
-    playlists.append(new_playlist)
+    append_tracks_to_playlist(new_playlist, tracks['items'])
+
+    while tracks['next']:
+        tracks = sp.next(tracks)
+        append_tracks_to_playlist(new_playlist, tracks['items'])
