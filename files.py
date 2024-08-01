@@ -24,12 +24,9 @@ def decodeString(artistString):
     return artistString.split("*")
 
 
-def writeInBinaryFile(fileName, string):
-    with open(fileName, 'wb') as f:
-        f.write(struct.pack('I', len(string)))
-        f.write(string)
-
-    f.close()
+def writeInBinaryFile(file, string):
+    file.write(struct.pack('I', len(string)))
+    file.write(string)
 
 
 def readFromBinaryFile(fileName, quantity):

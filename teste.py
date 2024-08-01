@@ -4,6 +4,7 @@ from spotipy.oauth2 import SpotifyOAuth
 import os
 from models import *
 
+total = 0
 
 def append_tracks_to_playlist(playlist, tracks):
     for track in tracks:
@@ -20,6 +21,8 @@ def append_tracks_to_playlist(playlist, tracks):
         
         playlist.append_track(new_track)
         # print(new_playlist.name, new_track.name)
+        global total
+        total += 1
 
 
 load_dotenv()
@@ -50,3 +53,5 @@ for _, playlist in enumerate(results['items']):
     while tracks['next']:
         tracks = sp.next(tracks)
         append_tracks_to_playlist(new_playlist, tracks['items'])
+
+print(total)

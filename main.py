@@ -1,7 +1,6 @@
 from files import *
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 clientId = os.getenv("CLIENT_ID")
@@ -17,11 +16,15 @@ artistJSON = requests.get(
 artistExample = makeArtistfromJSON(artistJSON.text)
 artistStringBin = encodeASCII(artistExample)
 
-print(artistStringBin)
-writeInBinaryFile('binaryFileEx.bin', artistStringBin)
-# writeInBinaryFile('binaryFileEx.bin', artistStringBin)
+file = open('binaryFileEx.bin', 'wb')
+writeInBinaryFile(file, artistStringBin)
+writeInBinaryFile(file, artistStringBin)
+file.close()
 
-# listOfArtists = readFromBinaryFile('binaryFileEx.bin', 2)
+listOfArtists = readFromBinaryFile('binaryFileEx.bin', 2)
 
-# newArtist1 = makeArtist(listOfArtists[0])
-# newArtist2 = makeArtist(listOfArtists[1])
+newArtist1 = makeArtist(listOfArtists[0])
+newArtist2 = makeArtist(listOfArtists[1])
+
+print(newArtist1)
+print(newArtist2)
