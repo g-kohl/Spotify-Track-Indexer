@@ -1,6 +1,4 @@
-from models import *
 import requests
-import os
 import json
 
 

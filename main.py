@@ -1,10 +1,11 @@
 from files import *
 from dotenv import load_dotenv
+from os import getenv
 
 load_dotenv()
 
-clientId = os.getenv("CLIENT_ID")
-clientSecret = os.getenv("CLIENT_SECRET")
+clientId = getenv("CLIENT_ID")
+clientSecret = getenv("CLIENT_SECRET")
 
 token = getAccessToken(clientId, clientSecret)
 

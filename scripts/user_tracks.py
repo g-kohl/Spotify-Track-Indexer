@@ -2,9 +2,9 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 import os
-from models import *
+from models.track import Track
+from models.playlist import Playlist
 
-total = 0
 
 def append_tracks_to_playlist(playlist, tracks):
     for track in tracks:
@@ -20,9 +20,6 @@ def append_tracks_to_playlist(playlist, tracks):
             )
         
         playlist.append_track(new_track)
-        # print(new_playlist.name, new_track.name)
-        global total
-        total += 1
 
 
 load_dotenv()
@@ -54,4 +51,11 @@ for _, playlist in enumerate(results['items']):
         tracks = sp.next(tracks)
         append_tracks_to_playlist(new_playlist, tracks['items'])
 
-print(total)
+    playlists.append(new_playlist)
+
+file = open("out.txt", "w", encoding="utf8")
+file.write("Playlist name - Track name")
+
+for p in playlists:
+    for t in p.tracks:
+        file.write("{} - {}\n".format(p.name, t.name))

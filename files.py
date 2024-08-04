@@ -1,6 +1,7 @@
 from APIcalls import *
 import struct
 import unicodedata
+from models.artist import Artist
 
 def makeArtistfromJSON(artistJSON):
     artistJSON = json.loads(artistJSON)
