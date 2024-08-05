@@ -5,7 +5,7 @@ from rich.layout import Layout
 import keyboard
 
 from models.track import Track
-from scripts.track_table import generate_track_table
+from track_table import generate_track_table
 
 tracks = [Track(1, "foo", 10, 50, False, "-"),
           Track(2, "bar", 10, 50, False, "-"),

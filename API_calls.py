@@ -2,12 +2,12 @@ import requests
 import json
 
 
-def getAccessToken(clientId, clientSecret):
+def get_access_token(client_id, client_secret):
     token = requests.post(
         "https://accounts.spotify.com/api/token",
         headers={"Content-Type": "application/x-www-form-urlencoded"},
         data="grant_type=client_credentials&client_id={}&client_secret={}".format(
-            clientId, clientSecret
+            client_id, client_secret
         ),
     )
     if not token:
@@ -20,5 +20,5 @@ def getAccessToken(clientId, clientSecret):
     return access_token
 
 
-def authorizationHeader(token):
+def authorization_header(token):
     return {"Authorization": "Bearer " + token}
