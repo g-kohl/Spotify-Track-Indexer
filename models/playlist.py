@@ -3,7 +3,6 @@ class Playlist:
         self.id = id
         self.name = name
         # self.followers = int(followers)
-        # self.external_URLS = external_URLs
         self.tracks = []
 
     def __str__(self):
