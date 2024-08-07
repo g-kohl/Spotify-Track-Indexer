@@ -13,11 +13,13 @@ def append_tracks_to_playlist(playlist, tracks):
         new_track = Track(
                 id=track_info['id'],
                 name=track_info['name'],
+                artist_name=track_info['artists'][0]['name'],
                 popularity=track_info['popularity'],
                 duration=track_info['duration_ms'],
                 explicit=track_info['explicit'],
-                external_URLs=track_info['external_urls']
             )
+        
+        print(track_info['artists'][0]['name'])
         
         playlist.append_track(new_track)
 
