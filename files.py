@@ -1,8 +1,7 @@
-from API_calls import *
-import struct
 import unicodedata
 from models.artist import Artist
 import pickle
+import json
 
 def make_artist_from_JSON(artist_JSON):
     artist_JSON = json.loads(artist_JSON)
