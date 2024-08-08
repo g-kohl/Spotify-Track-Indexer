@@ -1,4 +1,4 @@
-from files import *
+from classification_and_pesquisation import *
 from dotenv import load_dotenv
 import os
 import spotipy
@@ -20,6 +20,7 @@ def append_tracks_to_playlist(playlist, tracks):
             )
         
         playlist.append_track(new_track)
+        count_stats(new_track)
 
 
 load_dotenv()
@@ -52,19 +53,21 @@ for _, playlist in enumerate(results['items']):
 
     playlists.append(new_playlist)
 
-with open("binaryFileEx.bin", "wb") as file:
-    for p in playlists:
-        for t in p.tracks:
-            write_in_binary_file(t, file)
+stats = calculate_analytics()
+print(stats["total_tracks"], stats["popularity_mean"], stats["duration_mean"], stats["explicit_percentage"])
 
-file.close()
+# with open("binaryFileEx.bin", "wb") as file:
+#     for p in playlists:
+#         for t in p.tracks:
+#             write_in_binary_file(t, file)
 
-with open("binaryFileEx.bin", "rb") as file:
-    for p in playlists:
-        for _ in p.tracks:
-            track_loaded = read_from_binary_file(file)
-            print(track_loaded)
+# file.close()
 
-file.close()
+# with open("binaryFileEx.bin", "rb") as file:
+#     for p in playlists:
+#         for _ in p.tracks:
+#             track_loaded = read_from_binary_file(file)
+#             print(track_loaded)
 
+# file.close()
         
