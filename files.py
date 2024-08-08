@@ -1,6 +1,7 @@
-from API_calls import *
+
 import unicodedata
 import pickle
+import json
 
 
 def encode_ASCII(object):
