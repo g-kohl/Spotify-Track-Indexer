@@ -7,12 +7,16 @@ from models.track import Track
 from models.playlist import Playlist
 
 
+name_tree = BTree(50)
+loaded_tree = BTree(50)
+
 def append_tracks_to_playlist(playlist, tracks):
     for track in tracks:
         track_info = track['track']
 
         new_track = Track(
                 id=track_info['id'],
+                artist_name="artista",
                 name=track_info['name'],
                 popularity=track_info['popularity'],
                 duration=track_info['duration_ms'],
@@ -54,14 +58,36 @@ for _, playlist in enumerate(results['items']):
     playlists.append(new_playlist)
 
 stats = calculate_analytics()
-print(stats["total_tracks"], stats["popularity_mean"], stats["duration_mean"], stats["explicit_percentage"])
+# print(stats["total_tracks"], stats["popularity_mean"], stats["duration_mean"], stats["explicit_percentage"])
 
-# with open("binaryFileEx.bin", "wb") as file:
-#     for p in playlists:
-#         for t in p.tracks:
-#             write_in_binary_file(t, file)
 
-# file.close()
+with open("tracks_file.bin", "wb") as file:
+    for p in playlists:
+        for t in p.tracks:
+            name_tree.insert((t.name, file.tell()))
+            write_in_binary_file(t, file)
+
+    file.close()
+
+with open("btree.bin", "wb") as file:
+    write_in_binary_file(name_tree, file)
+
+    file.close()
+
+with open("btree.bin", "rb") as file:
+    loaded_tree = read_from_binary_file(file)
+
+    file.close()
+
+track_pointer = loaded_tree.search_key("Almah")
+
+with open("tracks_file.bin", "rb") as file:
+    file.seek(track_pointer)
+    track_loaded = read_from_binary_file(file)
+
+    file.close()
+
+print(track_loaded)
 
 # with open("binaryFileEx.bin", "rb") as file:
 #     for p in playlists:
