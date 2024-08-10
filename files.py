@@ -1,6 +1,5 @@
 import unicodedata
 import pickle
-import json
 
 
 def encode_ASCII(object):

@@ -10,19 +10,21 @@ from models.playlist import Playlist
 name_tree = BTree(50)
 loaded_tree = BTree(50)
 
+
 def append_tracks_to_playlist(playlist, tracks):
     for track in tracks:
         track_info = track['track']
 
         new_track = Track(
                 id=track_info['id'],
-                artist_name="artista",
+                artist_name=track_info['artists'][0]['name'],
                 name=track_info['name'],
                 popularity=track_info['popularity'],
                 duration=track_info['duration_ms'],
                 explicit=track_info['explicit'],
             )
-        
+ 
+        print(new_track.name, new_track.popularity)
         playlist.append_track(new_track)
         count_stats(new_track)
 
@@ -79,7 +81,7 @@ with open("btree.bin", "rb") as file:
 
     file.close()
 
-track_pointer = loaded_tree.search_key("Almah")
+track_pointer = loaded_tree.search_key("Overkill")
 
 with open("tracks_file.bin", "rb") as file:
     file.seek(track_pointer)
@@ -96,4 +98,3 @@ print(track_loaded)
 #             print(track_loaded)
 
 # file.close()
-        
