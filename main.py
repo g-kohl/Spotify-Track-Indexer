@@ -3,31 +3,12 @@ from dotenv import load_dotenv
 import os
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from models.track import Track
 from models.playlist import Playlist
 
 
 name_tree = BTree(50)
 loaded_tree = BTree(50)
-
-
-def append_tracks_to_playlist(playlist, tracks):
-    for track in tracks:
-        track_info = track['track']
-
-        new_track = Track(
-                id=track_info['id'],
-                artist_name=track_info['artists'][0]['name'],
-                name=track_info['name'],
-                popularity=track_info['popularity'],
-                duration=track_info['duration_ms'],
-                explicit=track_info['explicit'],
-            )
- 
-        print(new_track.name, new_track.popularity)
-        playlist.append_track(new_track)
-        count_stats(new_track)
-
+popularity_table = init_popularity_table()
 
 load_dotenv()
 
@@ -48,7 +29,9 @@ playlists = []
 
 for _, playlist in enumerate(results['items']):
     tracks = sp.playlist_items(playlist_id=playlist['id'],
-                               fields="items,next", additional_types="tracks")
+                               fields="items,next",
+                               additional_types="tracks")
+    
     new_playlist = Playlist(playlist['id'], playlist['name'])
 
     append_tracks_to_playlist(new_playlist, tracks['items'])
@@ -63,16 +46,22 @@ stats = calculate_analytics()
 # print(stats["total_tracks"], stats["popularity_mean"], stats["duration_mean"], stats["explicit_percentage"])
 
 
-with open("tracks_file.bin", "wb") as file:
+with open("tracks_file.bin", "ab") as file:
     for p in playlists:
         for t in p.tracks:
             name_tree.insert((t.name, file.tell()))
+            popularity_table[t.popularity].append(file.tell())
             write_in_binary_file(t, file)
 
     file.close()
 
 with open("btree.bin", "wb") as file:
     write_in_binary_file(name_tree, file)
+
+    file.close()
+
+with open("inverted_popurity_file.bin", "wb") as file:
+    write_in_binary_file(popularity_table, file)
 
     file.close()
 
@@ -90,6 +79,19 @@ with open("tracks_file.bin", "rb") as file:
     file.close()
 
 print(track_loaded)
+
+with open("inverted_popurity_file.bin", "rb") as file:
+    loaded_table = read_from_binary_file(file)
+
+    file.close()
+
+with open("tracks_file.bin", "rb") as file:
+    for track_pointer in loaded_table[50]:
+        file.seek(track_pointer)
+        track_loaded = read_from_binary_file(file)
+        print(track_loaded)
+
+    file.close()
 
 # with open("binaryFileEx.bin", "rb") as file:
 #     for p in playlists:

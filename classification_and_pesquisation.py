@@ -1,4 +1,5 @@
 from files import *
+from models.track import Track
 
 
 class BTreeNode:
@@ -69,6 +70,7 @@ class BTree:
         else:
             return self.search_key(k, self.root)
 
+
 tracks = []
 artists = []
 total_tracks = 0
@@ -78,6 +80,7 @@ total_explicit = 0
 popularity_mean = 0
 duration_mean = 0
 explict_percentage = 0
+
 
 def count_stats(track, artist_name=""):
     global total_popularity, total_duration, total_explicit
@@ -89,6 +92,7 @@ def count_stats(track, artist_name=""):
 
         tracks.append(track.id)
         # artists.add(artist_name)
+
 
 def calculate_analytics():
     global popularity_mean, duration_mean, explict_percentage
@@ -104,3 +108,30 @@ def calculate_analytics():
              'explicit_percentage' : explict_percentage}
     
     return stats
+
+
+def append_tracks_to_playlist(playlist, tracks):
+    for track in tracks:
+        track_info = track['track']
+
+        new_track = Track(
+                id=track_info['id'],
+                artist_name=track_info['artists'][0]['name'],
+                name=track_info['name'],
+                popularity=track_info['popularity'],
+                duration=track_info['duration_ms'],
+                explicit=track_info['explicit'],
+            )
+ 
+        # print(new_track.name, new_track.popularity)
+        playlist.append_track(new_track)
+        count_stats(new_track)
+
+
+def init_popularity_table():
+    dictionary = {}
+
+    for i in range(101):
+        dictionary[i] = []
+
+    return dictionary
