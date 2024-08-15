@@ -85,13 +85,25 @@ with open("inverted_popurity_file.bin", "rb") as file:
 
     file.close()
 
+lista100musicas = []
+
 with open("tracks_file.bin", "rb") as file:
-    for track_pointer in loaded_table[50]:
-        file.seek(track_pointer)
-        track_loaded = read_from_binary_file(file)
-        print(track_loaded)
+    track_counter = 0
+    i = 0
+
+    while track_counter < 100:
+        for track_pointer in loaded_table[100-i]:
+            file.seek(track_pointer)
+            loaded_track = read_from_binary_file(file)
+            lista100musicas.append(loaded_track)
+            track_counter += 1
+
+        i += 1
 
     file.close()
+
+for track in lista100musicas:
+    print(track)
 
 # with open("binaryFileEx.bin", "rb") as file:
 #     for p in playlists:
