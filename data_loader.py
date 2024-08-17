@@ -19,16 +19,6 @@ def build_data_structures():
                 break
         track_db.close()
 
-    with (open("tracks_file.bin", "rb")) as track_db:
-        for track_ptr in popularity_table[90]:
-            track_db.seek(track_ptr)
-
-            track = pickle.load(track_db)
-
-            print(track.name, track.popularity)
-
-        track_db.close()
-
     # writes name tree and popularity in files
     with open("btree.bin", "wb") as file:
         write_in_binary_file(name_tree, file)
@@ -67,15 +57,16 @@ def get_track(track_pointer, track_db):
     return track_loaded
 
 
-def get_most_popular_tracks(num, popularity_table):
+def get_tracks_order_by_popularity(num, is_descending, popularity_table):
     top_tracks = list()
 
     with open("tracks_file.bin", "rb") as file:
         track_counter = 0
-        i = 0
+        popularity = 100 if is_descending else 0
+        delta = -1 if is_descending else 1
 
         while track_counter < num:
-            for track_pointer in popularity_table[100-i]:
+            for track_pointer in popularity_table[popularity]:
                 try:
                     loaded_track = get_track(track_pointer, file)
                 except EOFError:
@@ -88,7 +79,7 @@ def get_most_popular_tracks(num, popularity_table):
                 if track_counter >= num:
                     break
 
-            i += 1
+            popularity += delta
 
         file.close()
 

@@ -9,7 +9,7 @@ import keyboard
 
 from data_loader import (
     load_popularity_table, 
-    get_most_popular_tracks, 
+    get_tracks_order_by_popularity, 
     build_data_structures,
     load_name_tree,
     get_track
@@ -32,7 +32,8 @@ popularity_table = load_popularity_table()
 name_tree = load_name_tree()
 
 if option == "0":
-    tracks = get_most_popular_tracks(100, popularity_table)
+    is_descending = Prompt.ask("Descending order?", choices=["y", "n"], )
+    tracks = get_tracks_order_by_popularity(100, is_descending == "y", popularity_table)
 
 elif option == "1":
     with open("tracks_file.bin", "rb") as track_db:
@@ -47,6 +48,7 @@ total_pages = math.ceil(len(tracks) / page_size)
 
 layout = make_layout()
 layout['body'].update(generate_track_table(tracks, current_page, page_size))
+layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
 with Live(layout) as live:
 
