@@ -1,4 +1,15 @@
 from rich.table import Table
+from rich.layout import Layout
+
+
+def make_layout():
+  layout = Layout()
+  layout.split(
+    Layout(name="header", ratio=1),
+    Layout(name="body", ratio=5)
+  )
+  return layout
+
 
 # TODO: adjust ratios and minimum sizes (for small terminals)
 def generate_track_table(tracks, page, page_size):

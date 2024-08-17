@@ -19,45 +19,40 @@ def append_tracks_to_playlist(playlist, tracks):
                 explicit=track_info['explicit'],
             )
         
-        print(track_info['artists'][0]['name'])
-        
         playlist.append_track(new_track)
 
 
-load_dotenv()
+# depends on environment variables and authorization
+def get_user_playlists():
+    load_dotenv()
 
-clientId = os.getenv("SPOTIPY_CLIENT_ID")
-clientSecret = os.getenv("SPOTIPY_CLIENT_SECRET")
-redirectUri = os.getenv("SPOTIPY_REDIRECT_URI")
+    clientId = os.getenv("SPOTIPY_CLIENT_ID")
+    clientSecret = os.getenv("SPOTIPY_CLIENT_SECRET")
+    redirectUri = os.getenv("SPOTIPY_REDIRECT_URI")
 
-scope = "user-library-read"
+    scope = "user-library-read"
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
-                                               client_id=clientId,
-                                               client_secret=clientSecret,
-                                               redirect_uri=redirectUri))
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope,
+                                                client_id=clientId,
+                                                client_secret=clientSecret,
+                                                redirect_uri=redirectUri))
 
 
-results = sp.current_user_playlists()
+    results = sp.current_user_playlists()
 
-playlists = []
+    playlists = []
 
-for _, playlist in enumerate(results['items']):
-    tracks = sp.playlist_items(playlist_id=playlist['id'],
-                               fields="items,next", additional_types="tracks")
-    new_playlist = Playlist(playlist['id'], playlist['name'])
+    for _, playlist in enumerate(results['items']):
+        tracks = sp.playlist_items(playlist_id=playlist['id'],
+                                fields="items,next", additional_types="tracks")
+        new_playlist = Playlist(playlist['id'], playlist['name'])
 
-    append_tracks_to_playlist(new_playlist, tracks['items'])
-
-    while tracks['next']:
-        tracks = sp.next(tracks)
         append_tracks_to_playlist(new_playlist, tracks['items'])
 
-    playlists.append(new_playlist)
+        while tracks['next']:
+            tracks = sp.next(tracks)
+            append_tracks_to_playlist(new_playlist, tracks['items'])
 
-file = open("out.txt", "w", encoding="utf8")
-file.write("Playlist name - Track name")
-
-for p in playlists:
-    for t in p.tracks:
-        file.write("{} - {}\n".format(p.name, t.name))
+        playlists.append(new_playlist)
+    
+    return playlists
