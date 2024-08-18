@@ -12,7 +12,9 @@ from data_loader import (
     get_tracks_order_by_popularity, 
     build_data_structures,
     load_name_tree,
-    get_track
+    load_prefix_tree,
+    get_track,
+    generate_analytics
 )
 
 from scripts.track_table import (
@@ -24,12 +26,15 @@ from scripts.track_table import (
 rich.print(Text("Available query options:"))
 rich.print(Text("0 -> Order by popularity"))
 rich.print(Text("1 -> Search by name"))
-option = Prompt.ask("Which one?", choices=["0", "1"])
+rich.print(Text("2 -> Search by prefix"))
+rich.print(Text("3 -> Generate analytics"))
+option = Prompt.ask("Which one?", choices=["0", "1", "2", "3"])
 
 build_data_structures()
 
 popularity_table = load_popularity_table()
 name_tree = load_name_tree()
+prefix_tree = load_prefix_tree()
 
 if option == "0":
     is_descending = Prompt.ask("Descending order?", choices=["y", "n"], )
@@ -41,6 +46,27 @@ elif option == "1":
         tracks = [get_track(name_tree.search_key(name), track_db)]
 
         track_db.close()
+
+elif option == "2":
+    with open("tracks_file.bin", "rb") as track_db:
+        prefix = Prompt.ask("Enter prefix") 
+        pointers = prefix_tree.starts_with(prefix)
+        tracks = list()
+
+        for p in pointers:
+           tracks.append(get_track(p, track_db))
+
+        track_db.close()
+
+elif option == "3":
+    stats = generate_analytics()
+
+    print("Total tracks:", stats['total_tracks'])
+    print("Popularity average:", stats['popularity_average'])
+    print("Duration average:", stats['duration_average'])
+    print("Explicit percentage:", stats['explicit_percentage'])
+
+    exit()
 
 page_size = 10
 current_page = 0

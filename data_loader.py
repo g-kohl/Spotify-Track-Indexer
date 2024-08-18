@@ -2,6 +2,7 @@ from classification_and_pesquisation import *
 
 def build_data_structures():
     name_tree = BTree(50)
+    prefix_tree = PrefixTree()
     popularity_table = init_popularity_table()
 
     # builds name tree and popularity table using tracks from db
@@ -9,10 +10,11 @@ def build_data_structures():
         track_ptr = 0
         while True:
             try:
-                track = pickle.load(track_db)
+                track = read_from_binary_file(track_db)
 
                 name_tree.insert((track.name, track_ptr))
                 popularity_table[track.popularity].append(track_ptr)
+                prefix_tree.insert(track.name, track_ptr)
 
                 track_ptr = track_db.tell()
             except EOFError:
@@ -30,6 +32,43 @@ def build_data_structures():
 
         file.close()
 
+    with open("trie.bin", "wb") as file:
+        write_in_binary_file(prefix_tree, file)
+
+        file.close()
+
+def generate_analytics():
+    total_popularity = 0
+    total_duration = 0
+    total_explicit = 0
+    tracks = []
+
+    with open("tracks_file.bin", "rb") as track_db:
+        while True:
+            try:
+                track = read_from_binary_file(track_db)
+
+                if not track.id in tracks:
+                    total_popularity += track.popularity
+                    total_duration += track.duration
+                    total_explicit += track.explicit
+                    tracks.append(track.id)
+
+            except EOFError:
+                break
+        track_db.close()
+
+    total_tracks = len(tracks)
+    popularity_average = total_popularity / total_tracks
+    duration_average = total_duration / total_tracks
+    explict_percentage = total_explicit / total_tracks
+
+    calculated_stats = {'total_tracks' : total_tracks,
+                        'popularity_average' : popularity_average,
+                        'duration_average' : duration_average,
+                        'explicit_percentage' : explict_percentage}
+    
+    return calculated_stats
 
 def load_name_tree():
     with open("btree.bin", "rb") as file:
@@ -47,6 +86,15 @@ def load_popularity_table():
         file.close()
 
     return loaded_table
+
+
+def load_prefix_tree():
+    with open("trie.bin", "rb") as file:
+        loaded_tree = read_from_binary_file(file)
+
+        file.close()
+
+    return loaded_tree
 
 
 # given a track pointer, searches it in track_db

@@ -71,61 +71,54 @@ class BTree:
             return self.search_key(k, self.root)
 
 
-tracks = []
-artists = []
-total_tracks = 0
-total_popularity = 0
-total_duration = 0
-total_explicit = 0
-popularity_mean = 0
-duration_mean = 0
-explict_percentage = 0
+class TrieNode:
+    def __init__(self, text = ''):
+        self.text = text
+        self.pointer = None
+        self.children = dict()
+        self.is_word = False
 
 
-def count_stats(track, artist_name=""):
-    global total_popularity, total_duration, total_explicit
+class PrefixTree:
+    def __init__(self):
+        self.root = TrieNode()
 
-    if not track.id in tracks:
-        total_popularity += track.popularity
-        total_duration += track.duration
-        total_explicit += track.explicit
+    def insert(self, word, pointer):
+        current = self.root
+        for i, char in enumerate(word):
+            if char not in current.children:
+                prefix = word[0:i+1]
+                current.children[char] = TrieNode(prefix)
+            current = current.children[char]
+        current.is_word = True
+        current.pointer = pointer
 
-        tracks.append(track.id)
-        # artists.add(artist_name)
+    def find(self, word):
+        current = self.root
+        for char in word:
+            if char not in current.children:
+                return None
+            current = current.children[char]
 
+        if current.is_word:
+            return current
 
-def calculate_analytics():
-    global popularity_mean, duration_mean, explict_percentage
+    def starts_with(self, prefix):
+        pointers = list()
+        current = self.root
+        for char in prefix:
+            if char not in current.children:
+                return list()
+            current = current.children[char]
 
-    total_tracks = len(tracks)
-    popularity_mean = total_popularity / total_tracks
-    duration_mean = total_duration / total_tracks
-    explict_percentage = total_explicit / total_tracks
-
-    stats = {'total_tracks' : total_tracks,
-             'popularity_mean' : popularity_mean,
-             'duration_mean' : duration_mean,
-             'explicit_percentage' : explict_percentage}
+        self.__child_words_for(current, pointers)
+        return pointers
     
-    return stats
-
-
-def append_tracks_to_playlist(playlist, tracks):
-    for track in tracks:
-        track_info = track['track']
-
-        new_track = Track(
-                id=track_info['id'],
-                artist_name=track_info['artists'][0]['name'],
-                name=track_info['name'],
-                popularity=track_info['popularity'],
-                duration=track_info['duration_ms'],
-                explicit=track_info['explicit'],
-            )
- 
-        # print(new_track.name, new_track.popularity)
-        playlist.append_track(new_track)
-        count_stats(new_track)
+    def __child_words_for(self, node, pointers):
+        if node.is_word:
+            pointers.append(node.pointer)
+        for letter in node.children:
+            self.__child_words_for(node.children[letter], pointers)
 
 
 def init_popularity_table():
