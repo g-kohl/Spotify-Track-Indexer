@@ -22,7 +22,6 @@ from scripts.track_table import (
     make_layout
 )
 
-
 rich.print(Text("Available query options:"))
 rich.print(Text("0 -> Order by popularity"))
 rich.print(Text("1 -> Search by name"))
@@ -43,14 +42,18 @@ if option == "0":
 elif option == "1":
     with open("tracks_file.bin", "rb") as track_db:
         name = Prompt.ask("Enter track name")
-        tracks = [get_track(name_tree.search_key(name), track_db)]
+
+        try:
+          tracks = [get_track(name_tree.search_key(name), track_db)]
+        except:
+           print("Track not found") # arrumar erros de quando musica nao existe
 
         track_db.close()
 
 elif option == "2":
     with open("tracks_file.bin", "rb") as track_db:
-        prefix = Prompt.ask("Enter prefix") 
-        pointers = prefix_tree.starts_with(prefix)
+        prefix = Prompt.ask("Enter prefix")
+        pointers = prefix_tree.starts_with(prefix.lower())
         tracks = list()
 
         for p in pointers:
@@ -89,6 +92,12 @@ with Live(layout) as live:
 
     if event.event_type == keyboard.KEY_DOWN and event.name == "left" or event.name == "up":
       current_page = current_page - 1 if current_page > 0 else current_page  
+      layout['body'].update(generate_track_table(tracks, current_page, page_size))
+      layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
+
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'r':
+      current_page = 0
+      tracks.reverse()
       layout['body'].update(generate_track_table(tracks, current_page, page_size))
       layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 

@@ -26,6 +26,9 @@ class BTree:
             self.insert_non_full(root, k)
 
     def insert_non_full(self, x, k):
+        if any(key[0] == k[0] for key in x.keys):
+            return
+
         i = len(x.keys) - 1
         if x.leaf:
             x.keys.append((None, None))
@@ -33,7 +36,7 @@ class BTree:
                 x.keys[i + 1] = x.keys[i]
                 i -= 1
             x.keys[i + 1] = k
-        else:
+        elif not x.leaf:
             while i >= 0 and k[0] < x.keys[i][0]:
                 i -= 1
             i += 1

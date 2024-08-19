@@ -14,7 +14,7 @@ def build_data_structures():
 
                 name_tree.insert((track.name, track_ptr))
                 popularity_table[track.popularity].append(track_ptr)
-                prefix_tree.insert(track.name, track_ptr)
+                prefix_tree.insert(track.name.lower(), track_ptr)
 
                 track_ptr = track_db.tell()
             except EOFError:
