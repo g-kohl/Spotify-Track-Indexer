@@ -22,84 +22,97 @@ from scripts.track_table import (
     make_layout
 )
 
-rich.print(Text("Available query options:"))
-rich.print(Text("0 -> Order by popularity"))
-rich.print(Text("1 -> Search by name"))
-rich.print(Text("2 -> Search by prefix"))
-rich.print(Text("3 -> Generate analytics"))
-option = Prompt.ask("Which one?", choices=["0", "1", "2", "3"])
+should_close = False
 
-build_data_structures()
+while not should_close:
+    rich.print(Text("Available query options:"))
+    rich.print(Text("0 -> Order by popularity"))
+    rich.print(Text("1 -> Search by name"))
+    rich.print(Text("2 -> Search by prefix"))
+    rich.print(Text("3 -> Generate analytics"))
+    option = Prompt.ask("Which one?", choices=["0", "1", "2", "3"])
 
-popularity_table = load_popularity_table()
-name_tree = load_name_tree()
-prefix_tree = load_prefix_tree()
+    build_data_structures()
 
-if option == "0":
-    is_descending = Prompt.ask("Descending order?", choices=["y", "n"], )
-    tracks = get_tracks_order_by_popularity(100, is_descending == "y", popularity_table)
+    popularity_table = load_popularity_table()
+    name_tree = load_name_tree()
+    prefix_tree = load_prefix_tree()
 
-elif option == "1":
-    with open("tracks_file.bin", "rb") as track_db:
-        name = Prompt.ask("Enter track name")
+    if option == "0":
+        is_descending = Prompt.ask("Descending order?", choices=["y", "n"], )
+        tracks = get_tracks_order_by_popularity(100, is_descending == "y", popularity_table)
 
-        try:
-          tracks = [get_track(name_tree.search_key(name), track_db)]
-        except:
-           print("Track not found") # arrumar erros de quando musica nao existe
+    elif option == "1":
+        with open("tracks_file.bin", "rb") as track_db:
+            name = Prompt.ask("Enter track name")
 
-        track_db.close()
+            try:
+                tracks = [get_track(name_tree.search_key(name), track_db)]
+            except:
+                print("Track not found") # arrumar erros de quando musica nao existe
 
-elif option == "2":
-    with open("tracks_file.bin", "rb") as track_db:
-        prefix = Prompt.ask("Enter prefix")
-        pointers = prefix_tree.starts_with(prefix.lower())
-        tracks = list()
+            track_db.close()
 
-        for p in pointers:
-           tracks.append(get_track(p, track_db))
+    elif option == "2":
+        with open("tracks_file.bin", "rb") as track_db:
+            prefix = Prompt.ask("Enter prefix")
+            pointers = prefix_tree.starts_with(prefix.lower())
+            tracks = list()
 
-        track_db.close()
+            for p in pointers:
+                tracks.append(get_track(p, track_db))
 
-elif option == "3":
-    stats = generate_analytics()
+            track_db.close()
 
-    print("Total tracks:", stats['total_tracks'])
-    print("Popularity average:", stats['popularity_average'])
-    print("Duration average:", stats['duration_average'])
-    print("Explicit percentage:", stats['explicit_percentage'])
+    elif option == "3":
+        stats = generate_analytics()
 
-    exit()
+        print("Total tracks:", stats['total_tracks'])
+        print("Popularity average:", stats['popularity_average'])
+        print("Duration average:", stats['duration_average'])
+        print("Explicit percentage:", stats['explicit_percentage'])
 
-page_size = 10
-current_page = 0
-total_pages = math.ceil(len(tracks) / page_size)
+        should_close = Prompt.ask("Search again?", choices=["y", "n"]) != "y"
+        
+        if should_close:
+            break
+        continue
 
-layout = make_layout()
-layout['body'].update(generate_track_table(tracks, current_page, page_size))
-layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
+    page_size = 10
+    current_page = 0
+    total_pages = math.ceil(len(tracks) / page_size)
 
-with Live(layout) as live:
+    layout = make_layout()
+    layout['body'].update(generate_track_table(tracks, current_page, page_size))
+    layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
-  while True:
-    time.sleep(0.2)
-    event = keyboard.read_event()
+    with Live(layout) as live:
 
-    if event.event_type == keyboard.KEY_DOWN and event.name == "right" or event.name == "down":
-      current_page = current_page + 1 if current_page + 1 < total_pages else current_page  
-      layout['body'].update(generate_track_table(tracks, current_page, page_size))
-      layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
+        while True:
+            time.sleep(0.2)
+            event = keyboard.read_event()
 
-    if event.event_type == keyboard.KEY_DOWN and event.name == "left" or event.name == "up":
-      current_page = current_page - 1 if current_page > 0 else current_page  
-      layout['body'].update(generate_track_table(tracks, current_page, page_size))
-      layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
+            if event.event_type == keyboard.KEY_DOWN and event.name == "right" or event.name == "down":
+                current_page = current_page + 1 if current_page + 1 < total_pages else current_page  
+                layout['body'].update(generate_track_table(tracks, current_page, page_size))
+                layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'r':
-      current_page = 0
-      tracks.reverse()
-      layout['body'].update(generate_track_table(tracks, current_page, page_size))
-      layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
+            if event.event_type == keyboard.KEY_DOWN and event.name == "left" or event.name == "up":
+                current_page = current_page - 1 if current_page > 0 else current_page  
+                layout['body'].update(generate_track_table(tracks, current_page, page_size))
+                layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'q':
-      break
+            if event.event_type == keyboard.KEY_DOWN and event.name == 'r':
+                current_page = 0
+                tracks.reverse()
+                layout['body'].update(generate_track_table(tracks, current_page, page_size))
+                layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
+
+            if event.event_type == keyboard.KEY_DOWN and event.name == 'q':
+                break
+
+
+    should_close = Prompt.ask("Search again?", choices=["y", "n"]) != "y"
+    
+    if should_close:
+        break
