@@ -1,3 +1,4 @@
+import datetime
 from classification_and_pesquisation import *
 
 def build_data_structures():
@@ -64,9 +65,9 @@ def generate_analytics():
     explict_percentage = total_explicit / total_tracks
 
     calculated_stats = {'total_tracks' : total_tracks,
-                        'popularity_average' : popularity_average,
-                        'duration_average' : duration_average,
-                        'explicit_percentage' : explict_percentage}
+                        'popularity_average' : round(popularity_average, 2),
+                        'duration_average' : str(datetime.timedelta(seconds=round(duration_average / 1000))),
+                        'explicit_percentage' : f"{round(explict_percentage * 100, 2)}%"}
     
     return calculated_stats
 

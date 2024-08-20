@@ -1,3 +1,4 @@
+import datetime
 from rich.table import Table
 from rich.layout import Layout
 
@@ -25,6 +26,6 @@ def generate_track_table(tracks, page, page_size):
   page_tracks = tracks[(page * page_size):((page + 1) * page_size)]
 
   for track in page_tracks:
-    table.add_row(f"{track.id}",f"{track.name}",f"{track.artist_name}", f"{track.popularity}",f"{track.duration}",f"{track.explicit}")
+    table.add_row(f"{track.id}",f"{track.name}",f"{track.artist_name}", f"{track.popularity}",f"{str(datetime.timedelta(seconds=round(track.duration / 1000)))}",f"{track.explicit}")
 
   return table

@@ -30,7 +30,7 @@ while not should_close:
     rich.print(Text("1 -> Search by name"))
     rich.print(Text("2 -> Search by prefix"))
     rich.print(Text("3 -> Generate analytics"))
-    option = Prompt.ask("Which one?", choices=["0", "1", "2", "3"])
+    option = Prompt.ask("Choose an option", choices=["0", "1", "2", "3"])
 
     build_data_structures()
 
