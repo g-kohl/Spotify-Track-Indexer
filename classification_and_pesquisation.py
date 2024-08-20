@@ -131,3 +131,29 @@ def init_popularity_table():
         dictionary[i] = []
 
     return dictionary
+
+
+def sort_track_list(tracks, attribute, low, high):
+    if low < high:
+        pi = partition(tracks, attribute, low, high)
+ 
+        sort_track_list(tracks, attribute, low, pi - 1)
+        sort_track_list(tracks, attribute, pi + 1, high)
+
+
+def partition(list, attribute, low, high):
+    pivot = list[high]
+    i = low - 1
+
+    for j in range(low, high):
+        if (attribute == "0" and list[j].popularity <= pivot.popularity or
+            attribute == "1" and list[j].name <= pivot.name or
+            attribute == "2" and list[j].artist_name <= pivot.artist_name):
+
+            i = i + 1
+
+            (list[i], list[j]) = (list[j], list[i])
+
+    (list[i + 1], list[high]) = (list[high], list[i + 1])
+ 
+    return i + 1

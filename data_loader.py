@@ -13,8 +13,10 @@ def build_data_structures():
             try:
                 track = read_from_binary_file(track_db)
 
-                name_tree.insert((track.name, track_ptr))
-                popularity_table[track.popularity].append(track_ptr)
+                if not name_tree.search_key(track.name):
+                    name_tree.insert((track.name, track_ptr))
+                    popularity_table[track.popularity].append(track_ptr)
+                    
                 prefix_tree.insert(track.name.lower(), track_ptr)
 
                 track_ptr = track_db.tell()

@@ -44,25 +44,41 @@ while not should_close:
 
     elif option == "1":
         with open("tracks_file.bin", "rb") as track_db:
-            name = Prompt.ask("Enter track name")
+            tracks = list()
 
-            try:
-                tracks = [get_track(name_tree.search_key(name), track_db)]
-            except:
-                print("Track not found") # arrumar erros de quando musica nao existe
+            while len(tracks) == 0:
+                name = Prompt.ask("Enter track name")
 
+                try:
+                    tracks = [get_track(name_tree.search_key(name), track_db)]
+                except:
+                    rich.print(Text("Track not found"))
+                
             track_db.close()
 
     elif option == "2":
         with open("tracks_file.bin", "rb") as track_db:
-            prefix = Prompt.ask("Enter prefix")
-            pointers = prefix_tree.starts_with(prefix.lower())
             tracks = list()
 
-            for p in pointers:
-                tracks.append(get_track(p, track_db))
+            while len(tracks) == 0:
+                prefix = Prompt.ask("Enter prefix")
+                pointers = prefix_tree.starts_with(prefix.lower())
+
+                if len(pointers) != 0:
+                    for p in pointers:
+                        tracks.append(get_track(p, track_db))
+                else:
+                    rich.print(Text("Prefix not found"))
 
             track_db.close()
+
+        rich.print(Text("Available sorting options:"))
+        rich.print(Text("0 -> Order by popularity"))
+        rich.print(Text("1 -> Order by track name"))
+        rich.print(Text("2 -> Order by artist name"))
+        sorting_option = Prompt.ask("Choose an option", choices=["0", "1", "2"])
+
+        sort_track_list(tracks, sorting_option, 0, len(tracks)-1)
 
     elif option == "3":
         stats = generate_analytics()
