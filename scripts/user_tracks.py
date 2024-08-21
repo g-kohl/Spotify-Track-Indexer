@@ -6,6 +6,7 @@ from models.track import Track
 from models.playlist import Playlist
 
 
+# Appends tracks to playlist
 def append_tracks_to_playlist(playlist, tracks):
     for track in tracks:
         track_info = track['track']
@@ -22,7 +23,7 @@ def append_tracks_to_playlist(playlist, tracks):
         playlist.append_track(new_track)
 
 
-# depends on environment variables and authorization
+# Returns list os playlists collected via API
 def get_user_playlists():
     load_dotenv()
 

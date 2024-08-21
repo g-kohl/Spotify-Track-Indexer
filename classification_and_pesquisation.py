@@ -14,6 +14,7 @@ class BTree:
         self.root = BTreeNode(True)
         self.t = t
 
+    # Inserts in B-tree
     def insert(self, k):
         root = self.root
         if len(root.keys) == (2 * self.t) - 1:
@@ -25,6 +26,7 @@ class BTree:
         else:
             self.insert_non_full(root, k)
 
+    # Auxiliar function for "insert"
     def insert_non_full(self, x, k):
         if any(key[0] == k[0] for key in x.keys):
             return
@@ -46,6 +48,7 @@ class BTree:
                     i += 1
             self.insert_non_full(x.child[i], k)
 
+    # Auxiliar function for "insert"
     def split_child(self, x, i):
         t = self.t
         y = x.child[i]
@@ -58,6 +61,7 @@ class BTree:
             z.child = y.child[t: 2 * t]
             y.child = y.child[0: t - 1]
 
+    # Returns searched key
     def search_key(self, k, x=None):
         if x is not None:
             i = 0
@@ -86,6 +90,7 @@ class PrefixTree:
     def __init__(self):
         self.root = TrieNode()
 
+    # Inserts in TRIE
     def insert(self, word, pointer):
         current = self.root
         for i, char in enumerate(word):
@@ -96,6 +101,7 @@ class PrefixTree:
         current.is_word = True
         current.pointer = pointer
 
+    # Returns searched word
     def find(self, word):
         current = self.root
         for char in word:
@@ -106,6 +112,7 @@ class PrefixTree:
         if current.is_word:
             return current
 
+    # Returns list of words matching the specified prefix
     def starts_with(self, prefix):
         pointers = list()
         current = self.root
@@ -117,6 +124,7 @@ class PrefixTree:
         self.__child_words_for(current, pointers)
         return pointers
     
+    # Auxiliar function for "starts_with"
     def __child_words_for(self, node, pointers):
         if node.is_word:
             pointers.append(node.pointer)
@@ -124,6 +132,7 @@ class PrefixTree:
             self.__child_words_for(node.children[letter], pointers)
 
 
+# Creates dictionary for inverted file
 def init_popularity_table():
     dictionary = {}
 
@@ -133,6 +142,7 @@ def init_popularity_table():
     return dictionary
 
 
+# Sorts a list of tracks based on the specified attribute
 def sort_track_list(tracks, attribute, low, high):
     if low < high:
         pi = partition(tracks, attribute, low, high)
@@ -141,6 +151,7 @@ def sort_track_list(tracks, attribute, low, high):
         sort_track_list(tracks, attribute, pi + 1, high)
 
 
+# Auxiliar function for "sort_track_list"
 def partition(list, attribute, low, high):
     pivot = list[high]
     i = low - 1

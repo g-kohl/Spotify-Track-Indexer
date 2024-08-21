@@ -1,4 +1,8 @@
 .env
 .cache
 .venv
+btree.bin
+inverted_popularity_file.bin
+tracks_file.bin
+trie.bin
 __pycache__/

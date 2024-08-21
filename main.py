@@ -22,9 +22,18 @@ from scripts.track_table import (
     make_layout
 )
 
+from database_setup import (
+    database_setup
+)
+
 should_close = False
+update = Prompt.ask("Update database?", choices=["y", "n"])
+
+if update == "y":
+    database_setup()
 
 while not should_close:
+    # get desired search option
     rich.print(Text("Available query options:"))
     rich.print(Text("0 -> Order by popularity"))
     rich.print(Text("1 -> Search by name"))
@@ -32,12 +41,14 @@ while not should_close:
     rich.print(Text("3 -> Generate analytics"))
     option = Prompt.ask("Choose an option", choices=["0", "1", "2", "3"])
 
+    # create data structures
     build_data_structures()
 
     popularity_table = load_popularity_table()
     name_tree = load_name_tree()
     prefix_tree = load_prefix_tree()
 
+    # search based on the option
     if option == "0":
         is_descending = Prompt.ask("Descending order?", choices=["y", "n"], )
         tracks = get_tracks_order_by_popularity(100, is_descending == "y", popularity_table)
@@ -92,8 +103,10 @@ while not should_close:
         
         if should_close:
             break
+
         continue
 
+    # creates layout
     page_size = 10
     current_page = 0
     total_pages = math.ceil(len(tracks) / page_size)
@@ -102,30 +115,38 @@ while not should_close:
     layout['body'].update(generate_track_table(tracks, current_page, page_size))
     layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
-    with Live(layout) as live:
+    # show results
+    with Live(layout, auto_refresh=False) as live:
 
         while True:
             time.sleep(0.2)
             event = keyboard.read_event()
 
+            # next page
             if event.event_type == keyboard.KEY_DOWN and event.name == "right" or event.name == "down":
                 current_page = current_page + 1 if current_page + 1 < total_pages else current_page  
                 layout['body'].update(generate_track_table(tracks, current_page, page_size))
                 layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
+            # previous page
             if event.event_type == keyboard.KEY_DOWN and event.name == "left" or event.name == "up":
                 current_page = current_page - 1 if current_page > 0 else current_page  
                 layout['body'].update(generate_track_table(tracks, current_page, page_size))
                 layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
+            # reverse results
             if event.event_type == keyboard.KEY_DOWN and event.name == 'r':
                 current_page = 0
                 tracks.reverse()
                 layout['body'].update(generate_track_table(tracks, current_page, page_size))
                 layout['header'].update(Text("Page {}/{}".format(current_page + 1, total_pages), justify="center"))
 
+            # exit search
             if event.event_type == keyboard.KEY_DOWN and event.name == 'q':
+                live.refresh()
                 break
+
+            live.refresh()
 
 
     should_close = Prompt.ask("Search again?", choices=["y", "n"]) != "y"

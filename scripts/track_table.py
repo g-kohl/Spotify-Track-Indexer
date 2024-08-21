@@ -3,6 +3,7 @@ from rich.table import Table
 from rich.layout import Layout
 
 
+# Creates layout for printing table
 def make_layout():
   layout = Layout()
   layout.split(
@@ -12,7 +13,7 @@ def make_layout():
   return layout
 
 
-# TODO: adjust ratios and minimum sizes (for small terminals)
+# Returns track table
 def generate_track_table(tracks, page, page_size):
   table = Table(expand=True)
 
